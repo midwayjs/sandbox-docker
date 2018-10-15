@@ -1,19 +1,19 @@
 CREATE DATABASE IF NOT EXISTS column_sandbox;
 
 CREATE TABLE `column_sandbox`.`sandbox_galaxy_sls_trace_nodes` (
-  `timestamp` datetime NOT NULL COMMENT '时间分表字段',
-  `scope` varchar(128) NOT NULL COMMENT '应用域 lookup',
-  `scope_name` varchar(256) NOT NULL COMMENT '应用名称 lookup',
-  `env` varchar(128) NOT NULL COMMENT '环境 lookup',
-  `hostname` varchar(512) NOT NULL COMMENT '机器名 filter',
-  `ip` varchar(512) NOT NULL COMMENT 'ip filter',
-  `uuid` varchar(256) NOT NULL COMMENT '链路唯一 ID filter',
-  `span_name` varchar(512) DEFAULT NULL COMMENT '???? filter',
-  `span_duration` int(11) DEFAULT NULL COMMENT '???? ms',
-  `span_type` int(11) DEFAULT NULL COMMENT '?? RPC ??',
-  `span_tags` mediumtext COMMENT '?? tags filter',
-  `span_id` varchar(128) DEFAULT NULL COMMENT '?? ID filter',
-  `span_rpcid` varchar(128) DEFAULT NULL COMMENT '?? RPC ID filter',
+  `timestamp` datetime NOT NULL COMMENT 'Timestamp',
+  `scope` varchar(128) NOT NULL COMMENT 'Application Scope',
+  `scope_name` varchar(256) NOT NULL COMMENT 'Application Name under Scope',
+  `env` varchar(128) NOT NULL COMMENT 'Environment, Such as dev, prod',
+  `hostname` varchar(512) NOT NULL COMMENT 'Host Name',
+  `ip` varchar(512) NOT NULL COMMENT 'IP',
+  `uuid` varchar(256) NOT NULL COMMENT 'Unique ID',
+  `span_name` varchar(512) DEFAULT NULL COMMENT 'Span Name',
+  `span_duration` int(11) DEFAULT NULL COMMENT 'Span Duration',
+  `span_type` int(11) DEFAULT NULL COMMENT 'Span Type',
+  `span_tags` mediumtext COMMENT 'Span Tags',
+  `span_id` varchar(128) DEFAULT NULL COMMENT 'Span ID',
+  `span_rpcid` varchar(128) DEFAULT NULL COMMENT 'Span RPC-ID',
   `span_code` varchar(128) DEFAULT NULL,
   `span_error` tinyint(4) DEFAULT '0',
   `span_method` varchar(128) DEFAULT NULL,
@@ -22,5 +22,5 @@ CREATE TABLE `column_sandbox`.`sandbox_galaxy_sls_trace_nodes` (
   `trace_id` varchar(256) DEFAULT NULL,
   `trace_name` text,
   `span_target` mediumtext
-) ENGINE=Columnstore DEFAULT CHARSET=utf8mb4 COMMENT='sls 采集的链路数据，分结点后' 
+) ENGINE=Columnstore DEFAULT CHARSET=utf8mb4 COMMENT='Trace Nodes'
 ;
