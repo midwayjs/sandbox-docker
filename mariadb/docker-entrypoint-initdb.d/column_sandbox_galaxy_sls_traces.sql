@@ -16,5 +16,5 @@ CREATE TABLE `column_sandbox`.`sandbox_galaxy_sls_traces` (
 `pid` varchar(256) DEFAULT NULL,
 `trace_name` text,
 `trace_status` int(11) DEFAULT '1'
-) ENGINE=Columnstore DEFAULT CHARSET=utf8mb4 COMMENT='Trace Logs'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Trace Logs'
 ;

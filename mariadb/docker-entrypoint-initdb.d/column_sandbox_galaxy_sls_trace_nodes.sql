@@ -22,5 +22,5 @@ CREATE TABLE `column_sandbox`.`sandbox_galaxy_sls_trace_nodes` (
   `trace_id` varchar(256) DEFAULT NULL,
   `trace_name` text,
   `span_target` mediumtext
-) ENGINE=Columnstore DEFAULT CHARSET=utf8mb4 COMMENT='Trace Nodes'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Trace Nodes'
 ;
