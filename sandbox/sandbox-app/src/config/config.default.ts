@@ -75,7 +75,7 @@ module.exports = appInfo => {
   };
 
   config.siteFile = {
-    '/favicon.ico': readFileSync(path.join(__dirname, '../app/public/favicon.png'))
+    '/favicon.ico': readFileSync(path.join(__dirname, '../../resource/favicon.png'))
   };
 
   config.security = {
