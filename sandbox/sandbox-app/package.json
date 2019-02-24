@@ -43,5 +43,8 @@
     "type": "git",
     "url": ""
   },
-  "license": "MIT"
+  "license": "MIT",
+  "midway-server-options": {
+    "typescript": false
+  }
 }
