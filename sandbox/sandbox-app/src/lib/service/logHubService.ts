@@ -138,6 +138,7 @@ export class LogHubService {
     }
 
     return urllib.request(`http://${host}:${port}/api/put`, {
+      method: 'POST',
       data: nextList
     });
 
