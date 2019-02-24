@@ -27,6 +27,7 @@ export class SandboxMetricsLogHubReporter {
     try {
       await urllib.request(this.url, {
         method: 'POST',
+        contentType: 'json',
         data: nextList
       });
     } catch(err) {

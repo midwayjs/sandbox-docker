@@ -16,17 +16,15 @@
     "@types/node": "^11.9.3",
     "midway-bin": "^0.3.2",
     "midway-mock": "^0.3.7",
-    "ts-node": "^7.0.0",
     "tslib": "^1.8.1",
     "tslint": "^5.9.1",
-    "typescript": "^3.2.2",
     "webstorm-disable-index": "^1.2.0"
   },
   "engines": {
     "install-alinode": "3.11.7"
   },
   "scripts": {
-    "start_prod": "pandora start",
+    "start_prod": "sh ./start.sh",
     "start": "NODE_ENV=local midway-bin dev --ts",
     "start_build": "npm run build && NODE_ENV=local midway-bin dev",
     "debug": "NODE_ENV=local midway-bin debug --ts",
@@ -43,8 +41,5 @@
     "type": "git",
     "url": ""
   },
-  "license": "MIT",
-  "midway-server-options": {
-    "typescript": false
-  }
+  "license": "MIT"
 }

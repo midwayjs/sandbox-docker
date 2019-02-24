@@ -1,5 +1,7 @@
 exports.components = {
-  sandboxFileReporter: null,
+  sandboxFileReporter: {
+    enable: false
+  },
   sandboxLogHubReporter: {
     path: './dist/pandora-component-sandbox-logger-hub-reporter/ComponentSandboxFileReporter.js'
   }
