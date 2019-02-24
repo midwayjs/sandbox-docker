@@ -1,8 +1,11 @@
-import { provide, inject, config } from 'midway';
+import { provide, inject, config, logger } from 'midway';
 import urllib = require('urllib');
 
 @provide('logHubService')
-export class Keycenter {
+export class LogHubService {
+
+  @logger()
+  protected logger;
 
   @inject()
   protected traceModel;
@@ -10,209 +13,171 @@ export class Keycenter {
   @inject()
   protected traceNodeModel;
 
-  @config()
-  config;
+  @inject()
+  protected errorModel;
+
+  @config('tsdb')
+  tsdbConfig;
 
   async putTrace(traces) {
+    for(const trace of traces) {
+      try {
+        await this.putTraceRecord(trace);
+      } catch(err) {
+        this.logger.warn(err);
+      }
+      try {
+        await this.putTraceNodeRecord(trace);
+      } catch(err) {
+        this.logger.warn(err);
+      }
+    }
+  }
 
+  async putTraceRecord(trace) {
 
-    // event.set('appName', ENV['SANDBOX_APP_NAME'] || 'pandora-dashboard')
-    // event.set('host', ENV['SANDBOX_HOST'] || 'iz8vba2t85gkivly0gdwanz')
-    // event.set('ip', ENV['SANDBOX_IP'] || '172.26.215.9')
-    // event.set('env', ENV['SANDBOX_ENV'] || 'dev')
-    // event.set('pid', '0')
+    const record = {
+      timestamp: new Date(trace.timestamp),
+      scope: trace.scope || 'sandbox',
+      scopeName: trace.appName,
+      env: trace.env,
+      hostname: trace.host,
+      ip: trace.ip,
+      pid: trace.pid,
+      uuid: trace.seed || trace.traceId,
+      traceId: trace.traceId,
+      traceSpans: trace.spans ? JSON.stringify(trace.spans) : null,
+      unixTimestamp: trace.unix_timestamp || Math.floor(trace.timestamp / 1000),
+      traceDuration: trace.duration,
+      traceName: trace.name,
+      traceStatus: trace.status,
+      version: 1
+    };
 
-    // filter {
-    //
-    //
-    //   if [my_type] == 'sandbox_trace' {
-    //     ruby {
-    //       code => "
-    //
-    //     #timestamp
-    //       timestamp = event.get('timestamp');
-    //       event.set('timestamp', timestamp)
-    //
-    //     # scope
-    //       event.set('scope', ENV['SANDBOX_SCOPE'] || 'sandbox')
-    //
-    //     # scope_name
-    //       appName = event.get('appName')
-    //       event.set('scope_name', appName)
-    //
-    //     # hostname
-    //       event.set('hostname', event.get('host'))
-    //
-    //     # uuid
-    //     # event.set('uuid', event.get('seed'))
-    //       event.set('uuid', event.get('traceId'))
-    //
-    //     # trace_spans
-    //       json_spans = LogStash::Json::dump(event.get('spans'))
-    //       event.set('trace_spans', json_spans)
-    //
-    //     # unix_timestamp
-    //       unix_timestamp = (timestamp / 1000).floor
-    //       event.set('unix_timestamp', unix_timestamp)
-    //
-    //     # trace_duration
-    //       event.set('trace_duration', event.get('duration'))
-    //
-    //     # trace_name
-    //       event.set('trace_name', event.get('name'))
-    //
-    //     # trace_status
-    //     # event.set('trace_status', event.get('status'))
-    //       event.set('trace_status', 0)
-    //
-    //     # version
-    //       event.set('version', 1)
-    //
-    //       "
-    //     }
-    //   }
-    //
-    //   if [my_type] == "sandbox_trace_node" {
-    //     split {
-    //       field => "spans"
-    //     }
-    //     ruby {
-    //       code => "
-    //
-    //       span = event.get('spans')
-    //
-    //     # scope
-    //       event.set('scope', ENV['SANDBOX_SCOPE'] || 'sandbox')
-    //
-    //     # scope_name
-    //       appName = event.get('appName')
-    //       event.set('scope_name', appName)
-    //
-    //     # hostname
-    //       event.set('hostname', event.get('host'))
-    //
-    //     # span_name
-    //       event.set('span_name', span['name'])
-    //
-    //     # span_duration
-    //       event.set('span_duration', span['duration'])
-    //
-    //     # span_tags
-    //       json_tags = LogStash::Json::dump(span['tags'])
-    //       event.set('span_tags', json_tags)
-    //
-    //     # span_id
-    //       spanId = span['context']['spanId'];
-    //       event.set('span_id', span['context']['spanId'])
-    //
-    //     # span_rpcid
-    //       event.set('span_rpcid', span['context']['rpcId'])
-    //
-    //     # span_timestamp
-    //     # event.set('span_timestamp', span['timestamp'])
-    //
-    //     # timestamp
-    //       event.set('timestamp', span['timestamp'])
-    //
-    //     # trace_id
-    //       traceId = span['context']['traceId'];
-    //       event.set('trace_id', traceId)
-    //
-    //     # trace_name
-    //       event.set('trace_name', event.get('name'))
-    //
-    //     #span_error
-    //       event.set('span_error', span['tags']['error'] && span['tags']['error']['value'] ? 1 : 0)
-    //
-    //     # uuid, no way to gen a uuid, use traceId + spanId as a substitution
-    //       event.set('uuid', traceId + '-' + spanId)
-    //
-    //     # TODO: span_method
-    //       event.set('span_method', span['method'])
-    //
-    //     # TODO: span_target
-    //       event.set('span_target', span['target'])
-    //
-    //     # 下面几个暂时不实现
-    //     # TODO: span_type
-    //     # TODO: span_code
-    //       "
-    //     }
-    //   }
-    //
-    // }
-    //
-    // output {
-    //
-    //   stdout {
-    //     codec => rubydebug
-    //   }
-    //
-    //   if [my_type] == 'sandbox_metrics' {
-    //
-    //     opentsdb {
-    //       host => "172.26.215.10"
-    //       port => 4242
-    //       metrics => [
-    //
-    //         "%{metric}",
-    //         "%{value}",
-    //
-    //         "scope",
-    //         "%{scope}",
-    //
-    //         "ip",
-    //         "%{ip}",
-    //
-    //         "scope_name",
-    //         "%{appName}",
-    //
-    //         "hostname",
-    //         "%{host}",
-    //
-    //         "env",
-    //         "%{env}",
-    //
-    //         "pid",
-    //         "%{pid}",
-    //
-    //         "level",
-    //         "%{level}",
-    //
-    //         "type",
-    //         "%{type}"
-    //
-    //       ]
-    //     }
-    //   }
-    //
-    //   if [my_type] == 'sandbox_trace' {
-    //     jdbc {
-    //       driver_jar_path => "/root/sandbox-docker/app/logstash/jdbc/mariadb-java-client-2.3.0.jar"
-    //       connection_string => "jdbc:mariadb://172.26.215.10:3306/column_sandbox?user=sandbox&password=sandbox"
-    //       statement => [ "INSERT INTO sandbox_galaxy_sls_traces (timestamp, scope, scope_name, env, hostname, ip, uuid, trace_id, version, trace_spans, unix_timestamp, trace_duration, pid, trace_name, trace_status) values (FROM_UNIXTIME(?/1000), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", "timestamp", "scope", "scope_name", "env", "hostname", "ip", "uuid", "trace_id", "version", "trace_spans", "unix_timestamp", "trace_duration", "pid", "trace_name", "trace_status" ]
-    //     }
-    //   }
-    //
-    //   if [my_type] == "sandbox_trace_node" {
-    //     jdbc {
-    //       driver_jar_path => "/root/sandbox-docker/app/logstash/jdbc/mariadb-java-client-2.3.0.jar"
-    //       connection_string => "jdbc:mariadb://172.26.215.10:3306/column_sandbox?user=sandbox&password=sandbox"
-    //       statement => [ "INSERT INTO sandbox_galaxy_sls_trace_nodes (timestamp, scope, scope_name, env, hostname, ip, uuid, span_name, span_duration, span_tags, span_id, span_rpcid, span_error, span_timestamp, pid, trace_id, trace_name, span_method, span_target ) VALUES (FROM_UNIXTIME(?/1000), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?/1000), ?, ?, ?, ?, ? )", "timestamp", "scope", "scope_name", "env", "hostname", "ip", "uuid", "span_name", "span_duration", "span_tags", "span_id", "span_rpcid", "span_error", "span_timestamp", "pid", "trace_id", "trace_name", "span_method", "span_target" ]
-    //     }
-    //   }
-    //
-    // }
-
+    return this.traceModel.create(record, { raw: true });
 
   }
 
-  async putMetrics(data) {
-    const {tsdb} = this.config;
-    const {host, port} = tsdb;
+  async putTraceNodeRecord(trace) {
+
+    if(!trace.spans) {
+      return;
+    }
+
+    for(const span of trace.spans) {
+
+      try {
+
+        const traceId = span.context && span.context.traceId || trace.traceId;
+        const spanId = span.context && span.context.spanId;
+
+        const record = {
+
+          timestamp: span.timestamp,
+          spanTimestamp: span.timestamp,
+
+          scope: trace.scope || 'sandbox',
+          scopeName: trace.appName,
+          env: trace.env,
+          hostname: trace.host,
+          ip: trace.ip,
+          pid: trace.pid,
+
+
+          spanName: span.name,
+          spanDuration: span.duration,
+          spanTags: span.tags ? JSON.stringify(span.tags) : null,
+          spanId: spanId,
+          spanRpcId: span.context && span.context.rpcId,
+          traceId: traceId,
+          traceName: trace.name,
+          spanError: span.tags && span.tags.error ? 1 : 0,
+
+          uuid: traceId + '-' + spanId,
+
+          spanMethod: span.method,
+          spanTarget: span.target
+
+        };
+
+        await this.traceNodeModel.create(record, { raw: true });
+
+      } catch(err) {
+        this.logger.warn(err);
+      }
+
+    }
+
+  }
+
+  async putMetrics(list) {
+
+    const {host, port} = this.tsdbConfig;
+    const nextList = [];
+
+    for(const one of list) {
+      try {
+        nextList.push({
+          metric: one.metric,
+          timestamp: one.timestamp,
+          value: one.value,
+          tags: {
+            scope: one.scope,
+            ip: one.ip,
+            scope_name: one.appName,
+            hostname: one.host,
+            env: one.env,
+            pid: one.pid,
+            level: one.level,
+            type: one.type
+          }
+        });
+      } catch(err) {
+        this.logger.warn(err);
+      }
+    }
+
     return urllib.request(`http://${host}:${port}/api/put`, {
-      data: data
+      data: nextList
     });
+
+  }
+
+
+  async putError(list) {
+
+    for(const one of list) {
+
+      try {
+
+        const record = {
+          timestamp: new Date(one.timestamp),
+          unixTimestamp: one.unix_timestamp,
+
+          scope: one.scope,
+          scopeName: one.appName,
+          ip: one.ip,
+          hostname: one.host,
+          env: one.env,
+          pid: one.pid,
+          errorType: one.errorType,
+          errorMessage: one.message,
+          errorStack: one.stack,
+          traceId: one.traceId,
+          logPath: one.path,
+          uuid: one.seed,
+
+          version: 1
+        };
+
+        await this.errorModel.create(record, { raw: true });
+
+      } catch(err) {
+        this.logger.warn(err);
+      }
+
+    }
+
   }
 
 }

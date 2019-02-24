@@ -6,8 +6,9 @@
     "chrome-devtools-frontend": "^1.0.590489",
     "egg-view-nunjucks": "^2.2.0",
     "midway": "^1.0.2",
+    "pandora": "release-2.x",
     "sandbox-core": "^0.0.15",
-    "pandora": "release-2.x"
+    "urllib": "^2.33.0"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
