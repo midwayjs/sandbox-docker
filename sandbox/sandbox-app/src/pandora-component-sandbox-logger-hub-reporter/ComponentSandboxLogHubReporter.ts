@@ -20,7 +20,7 @@ import {SandboxErrorLogLogHubReporter} from './SandboxErrorLogLogHubReporter';
     },
   }
 })
-export default class ComponentSandboxFileReporter {
+export default class ComponentSandboxLogHubReporter {
 
   ctx: any;
   constructor(ctx) {
@@ -40,9 +40,9 @@ export default class ComponentSandboxFileReporter {
 
   startAtAllProcesses() {
     const reporterManager: ReporterManager = this.ctx.reporterManager;
-    reporterManager.register('sandboxMetricsFileReporter', new SandboxMetricsLogHubReporter(this.ctx));
-    reporterManager.register('sandboxTraceFileReporter', new SandboxTraceLogHubReporter(this.ctx));
-    reporterManager.register('sandboxErrorLogFileReporter', new SandboxErrorLogLogHubReporter(this.ctx));
+    reporterManager.register('sandboxMetricsLogHubReporter', new SandboxMetricsLogHubReporter(this.ctx));
+    reporterManager.register('sandboxTraceLogHubReporter', new SandboxTraceLogHubReporter(this.ctx));
+    reporterManager.register('sandboxErrorLogLogHubReporter', new SandboxErrorLogLogHubReporter(this.ctx));
   }
 
 }
