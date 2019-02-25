@@ -1,5 +1,5 @@
 import urllib = require('urllib');
-import {ReporterUtil} from './ReporterUtil';
+import {ReporterUtil, spanToJson} from './ReporterUtil';
 
 export class SandboxTraceLogHubReporter {
   type = 'trace';
@@ -23,7 +23,7 @@ export class SandboxTraceLogHubReporter {
             // 如果 span 有 toJSON 接口，则使用 toJSON 接口获得序列化对象
             traceData2nd.spans.push(span.toJSON());
           } else {
-            traceData2nd.spans.push(span);
+            traceData2nd.spans.push(spanToJson(span));
           }
         }
       }

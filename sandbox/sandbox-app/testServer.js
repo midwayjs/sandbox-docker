@@ -38,3 +38,7 @@ class SimpleHTTPServer {
 const server = new SimpleHTTPServer();
 server.start();
 
+
+setInterval(() => {
+  console.error(new Error('fake Error' + (new Date)));
+}, 500);

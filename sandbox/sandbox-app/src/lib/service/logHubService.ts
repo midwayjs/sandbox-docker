@@ -1,6 +1,11 @@
 import { provide, inject, config, logger } from 'midway';
 import urllib = require('urllib');
 
+const METRICS_BATCH_SLICE_SIZE = 20;
+const DEFAULT_SCOPE = 'sandbox';
+const DEFAULT_ENV = 'prod';
+
+
 @provide('logHubService')
 export class LogHubService {
 
@@ -38,9 +43,9 @@ export class LogHubService {
 
     const record = {
       timestamp: new Date(trace.timestamp),
-      scope: trace.scope || 'sandbox',
+      scope: trace.scope || DEFAULT_SCOPE,
       scopeName: trace.appName,
-      env: trace.env,
+      env: trace.env || DEFAULT_ENV,
       hostname: trace.host,
       ip: trace.ip,
       pid: trace.pid,
@@ -76,9 +81,9 @@ export class LogHubService {
           timestamp: span.timestamp,
           spanTimestamp: span.timestamp,
 
-          scope: trace.scope || 'sandbox',
+          scope: trace.scope || DEFAULT_SCOPE,
           scopeName: trace.appName,
-          env: trace.env,
+          env: trace.env || DEFAULT_ENV,
           hostname: trace.host,
           ip: trace.ip,
           pid: trace.pid,
@@ -117,16 +122,19 @@ export class LogHubService {
 
     for(const one of list) {
       try {
+        if(one.value == null || one.metric == null) {
+          continue;
+        }
         nextList.push({
           metric: one.metric,
           timestamp: one.timestamp,
-          value: one.value,
+          value: one.value || 0,
           tags: {
-            scope: one.scope,
+            scope: one.scope || DEFAULT_SCOPE,
             ip: one.ip,
             scope_name: one.appName,
             hostname: one.host,
-            env: one.env,
+            env: one.env || DEFAULT_ENV,
             pid: one.pid,
             level: one.level,
             type: one.type
@@ -137,10 +145,33 @@ export class LogHubService {
       }
     }
 
-    return urllib.request(`http://${host}:${port}/api/put`, {
-      method: 'POST',
-      data: nextList
-    });
+    for(let idx = 0, len = Math.ceil(nextList.length / METRICS_BATCH_SLICE_SIZE); idx < len; idx++) {
+      const start = idx * METRICS_BATCH_SLICE_SIZE;
+      const end = (idx + 1) * METRICS_BATCH_SLICE_SIZE;
+      const slice = nextList.slice(start, end);
+      try {
+        const resp = await urllib.request(`http://${host}:${port}/api/put?summary&details`, {
+          method: 'POST',
+          contentType: 'json',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 10000,
+          data: slice
+        });
+        if (resp.status !== 200) {
+          if (resp.data && resp.data.error) {
+            const err = new Error(resp.data.error.message);
+            Object.assign(err, resp.data.error);
+            throw err;
+          } else {
+            throw new Error('TSDB unknown error with http code: ' + resp.status);
+          }
+        }
+      } catch(err) {
+        this.logger.warn(err);
+      }
+    }
 
   }
 
@@ -155,11 +186,11 @@ export class LogHubService {
           timestamp: new Date(one.timestamp),
           unixTimestamp: one.unix_timestamp,
 
-          scope: one.scope,
+          scope: one.scope || DEFAULT_SCOPE,
           scopeName: one.appName,
           ip: one.ip,
           hostname: one.host,
-          env: one.env,
+          env: one.env || DEFAULT_ENV,
           pid: one.pid,
           errorType: one.errorType,
           errorMessage: one.message,

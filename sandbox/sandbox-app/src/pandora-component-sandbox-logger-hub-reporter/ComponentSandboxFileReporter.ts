@@ -25,8 +25,8 @@ export default class ComponentSandboxFileReporter {
   ctx: any;
   constructor(ctx) {
     this.ctx = ctx;
-    if(!ctx.config.sandboxLogHubReporter.appName) {
-      ctx.config.sandboxLogHubReporter.appName = ctx.appName;
+    if(!ctx.config.sandboxLogHubReporter.globalTags.appName) {
+      ctx.config.sandboxLogHubReporter.globalTags.appName = ctx.appName;
     }
   }
 
