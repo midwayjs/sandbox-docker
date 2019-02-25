@@ -32,7 +32,7 @@ sudo docker-compose build && sudo docker-compose up
 exports.components = {
   // 配置使用 LogHub 向 Sandbox 写入数据
   sandboxLogHubReporter: {
-    path: 'pandora-component-sandbox-logger-hub-reporter'
+    path: 'pandora-component-sandbox-log-hub-reporter'
   },
   // 打开基于 Patch 和 AsyncHooks 自动获取数据
   autoPatching: {
