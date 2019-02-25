@@ -12,4 +12,3 @@ services:
     build: ./sandbox
     ports:
      - "7001:7001"
-     - "8888:8888"
