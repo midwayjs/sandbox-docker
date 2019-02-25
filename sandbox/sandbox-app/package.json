@@ -25,7 +25,7 @@
     "install-alinode": "3.11.7"
   },
   "scripts": {
-    "start_prod": "sh ./start.sh",
+    "start_prod": "pandora start",
     "start": "NODE_ENV=local midway-bin dev --ts",
     "start_build": "npm run build && NODE_ENV=local midway-bin dev",
     "debug": "NODE_ENV=local midway-bin debug --ts",
@@ -42,5 +42,13 @@
     "type": "git",
     "url": ""
   },
-  "license": "MIT"
+  "license": "MIT",
+  "midway-server-options": {
+    "typescript": true
+  },
+  "midway-bin-build": {
+    "include": [
+      "app/view"
+    ]
+  }
 }
