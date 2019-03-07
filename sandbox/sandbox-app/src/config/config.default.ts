@@ -10,7 +10,7 @@ module.exports = appInfo => {
   // Part 1
   // 核心配置
   config.container = {
-    loadDir: [ `${appInfo.appDir}/node_modules/sandbox-core/dist/core`, __filename.endsWith('.ts') ? 'src' : 'dist' ],
+    loadDir: [ `${appInfo.appDir}/node_modules/sandbox-core/dist/core`, __filename.endsWith('.ts') ? `${appInfo.appDir}/src` : `${appInfo.appDir}/dist` ],
   };
 
   config.pandora = {

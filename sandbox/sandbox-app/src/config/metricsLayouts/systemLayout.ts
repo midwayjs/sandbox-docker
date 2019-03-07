@@ -78,7 +78,7 @@ export const systemLayout = [
             type: 'number',
             aggregator: 'sum',
             metric: 'system.nettraffic.eth0.net.in.bytes',
-            unit: 'Bytes/ms',
+            unit: 'Bytes/s',
             title: 'eth0 流入',
           },
         ],
@@ -90,7 +90,7 @@ export const systemLayout = [
             type: 'number',
             aggregator: 'sum',
             metric: 'system.nettraffic.eth0.net.out.bytes',
-            unit: 'Bytes/ms',
+            unit: 'Bytes/s',
             title: 'eth0 流出',
           },
         ],
@@ -132,24 +132,24 @@ export const systemLayout = [
         ],
       },
       {
-        title: 'Nginx QPS',
+        title: 'HTTP Server QPS',
         indicators: [
           {
             type: 'number',
             aggregator: 'sum',
-            metric: 'system.tsar.nginx_qps',
+            metric: 'middleware.http.request.qps',
             title: 'Nginx QPS',
             unit: '次/秒',
           },
         ],
       },
       {
-        title: 'Nginx RT',
+        title: 'HTTP Server RT',
         indicators: [
           {
             type: 'number',
             aggregator: 'avg',
-            metric: 'system.tsar.nginx_rt',
+            metric: 'middleware.http.request.rt',
             title: 'Nginx RT',
             unit: 'ms',
           },

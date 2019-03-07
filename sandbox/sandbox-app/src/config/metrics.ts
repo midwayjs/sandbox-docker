@@ -27,11 +27,11 @@ export const coreMetrics = {
   },
   qps: {
     aggregator: 'sum',
-    metric: 'system.tsar.nginx_qps',
+    metric: 'middleware.http.request.qps',
   },
   rt: {
     aggregator: 'avg',
-    metric: 'system.tsar.nginx_rt',
+    metric: 'middleware.http.request.rt',
   },
   errorCount: {
     aggregator: 'sum',

@@ -9,6 +9,7 @@
     "midway": "^1.0.2",
     "pandora": "release-2.x",
     "pandora-component-auto-patching": "release-2.x",
+    "pandora-component-sandbox-log-hub-reporter": "^1.0.0",
     "sandbox-core": "^0.0.15",
     "urllib": "^2.33.0"
   },
