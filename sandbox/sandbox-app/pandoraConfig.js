@@ -1,6 +1,6 @@
 exports.components = {
   sandboxLogHubReporter: {
-    path: './dist/pandora-component-sandbox-logger-hub-reporter/ComponentSandboxLogHubReporter.js'
+    path: 'pandora-component-sandbox-logger-hub-reporter'
   },
   autoPatching: {
     path: 'pandora-component-auto-patching'
